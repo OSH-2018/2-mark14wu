@@ -136,13 +136,12 @@ int getcmd(char *buf, int nbuf) // 获取命令
   if (isatty(fileno(stdin)))
     fprintf(stdout, "$ ");
   memset(buf, 0, nbuf);
-  // scanf("%*[^\n]%*c"); // 清空 stdin
-  fgets(buf, nbuf, stdin);
-  if(buf[0] == 0){ // EOF
-    // scanf("%*[^\n]%*c"); // 清空 stdin
-    // exit(-1);
+  char t;
+  t = getchar();
+  if(t == '\n')
     return -1;
-  }
+  fgets(buf+1, nbuf, stdin);
+  buf[0] = t;
   return 0;
 }
 
@@ -155,6 +154,8 @@ int main() {
       // 获取命令 
       // scanf("%*[^\n]%*c"); // 清空 stdin
       if(getcmd(buf, sizeof(buf)) < 0)
+        continue;
+      if(buf[0] == '\n')
         continue;
       if(buf[0] == 'c' && buf[1] == 'd' && buf[2] == ' '){
         // 特判处理 Chdir 命令
