@@ -141,7 +141,7 @@ int getcmd(char *buf, int nbuf) // 获取命令
   if(buf[0] == 0){ // EOF
     // scanf("%*[^\n]%*c"); // 清空 stdin
     exit(-1);
-    // return -1;
+    return -1;
   }
   return 0;
 }
@@ -154,7 +154,8 @@ int main() {
     while (1) {
       // 获取命令 
       // scanf("%*[^\n]%*c"); // 清空 stdin
-      getcmd(buf, sizeof(buf));
+      if(getcmd(buf, sizeof(buf)) < 0)
+        continue;
       if(buf[0] == 'c' && buf[1] == 'd' && buf[2] == ' '){
         // 特判处理 Chdir 命令
         // 如果用子进程执行 cd 命令，那么父进程工作目录不会改变
@@ -166,14 +167,13 @@ int main() {
       }
       usercmd = parsecmd(buf);
       if (usercmd->type == ' '){
-        // usercmd = (struct execcmd*) usercmd;
+        // 原理和 Chdir 类似
         globalcmd = (struct execcmd*) usercmd;
         if (strcmp(globalcmd->argv[0], "export") == 0){
           putenv(globalcmd->argv[1]);
           continue;
         }
         if (strcmp(globalcmd->argv[0], "exit") == 0) {
-          // 原理和 Chdir 类似
           fflush(stdout);
           exit(0);
         }
