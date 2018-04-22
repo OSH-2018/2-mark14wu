@@ -136,12 +136,13 @@ int getcmd(char *buf, int nbuf) // 获取命令
   if (isatty(fileno(stdin)))
     fprintf(stdout, "$ ");
   memset(buf, 0, nbuf);
-  char t;
-  t = getchar();
-  if(t == '\n')
-    return -1;
-  fgets(buf+1, nbuf, stdin);
-  buf[0] = t;
+  // char t;
+  // t = getchar();
+  // if(t == '\n')
+  //   return -1;
+  // fgets(buf+1, nbuf, stdin);
+  fgets(buf, nbuf, stdin);
+  // buf[0] = t;
   return 0;
 }
 
