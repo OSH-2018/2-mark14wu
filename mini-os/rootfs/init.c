@@ -140,7 +140,7 @@ int getcmd(char *buf, int nbuf) // 获取命令
   fgets(buf, nbuf, stdin);
   if(buf[0] == 0){ // EOF
     // scanf("%*[^\n]%*c"); // 清空 stdin
-    exit(-1);
+    // exit(-1);
     return -1;
   }
   return 0;
