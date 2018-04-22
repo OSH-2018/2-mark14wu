@@ -70,6 +70,21 @@ void runcmd(struct cmd *cmd)
       puts(getcwd(wd, 4096));
       break;
     }
+    if (strcmp(ecmd->argv[0], "export") == 0){
+      // char key[256];
+      // char value[256];
+      char s[256];
+      strcpy(s, ecmd->argv[1]);
+      printf("%s", s);
+      char* div = strchr(s, '='); // 找到等号位置
+      if (div != NULL){
+        putenv(s);
+      }
+      // else
+      // *div = '\0';
+      // strcpy(key, s); // 获取 key 值
+      // strcpy(value, div + 1); // 获取 value 值
+    }
     // external commands
     execvp(ecmd->argv[0], ecmd->argv);
     break;
@@ -131,14 +146,11 @@ int getcmd(char *buf, int nbuf) // 获取命令
   return 0;
 }
 
-void my_exit(int n){
-  fflush(stdout);
-  exit(n);
-}
-
 int main() {
     /* 输入缓冲区 */
     static char buf[256];
+    struct cmd* usercmd;
+    struct execcmd* globalcmd;
     while (1) {
       // 获取命令 
       // scanf("%*[^\n]%*c"); // 清空 stdin
@@ -152,14 +164,23 @@ int main() {
           fprintf(stderr, "cannot cd %s\n", buf+3);
         continue;
       }
-      if (strcmp(buf, "exit") == 0) {
-        // 原理和 Chdir 类似
-        fflush(stdout);
-        exit(0);
+      usercmd = parsecmd(buf);
+      if (usercmd->type == ' '){
+        // usercmd = (struct execcmd*) usercmd;
+        globalcmd = (struct execcmd*) usercmd;
+        if (strcmp(globalcmd->argv[0], "export") == 0){
+          putenv(globalcmd->argv[1]);
+          continue;
+        }
+        if (strcmp(globalcmd->argv[0], "exit") == 0) {
+          // 原理和 Chdir 类似
+          fflush(stdout);
+          exit(0);
+        }
       }
       if(fork1() == 0)
         // 子进程创建成功，开始执行终端命令
-        runcmd(parsecmd(buf));
+        runcmd(usercmd);
       /* 父进程 */
       wait(NULL);
     }
